@@ -12,7 +12,7 @@
 #define HW_DISPLAY_GEFORCE_H
 
 #include "qemu/osdep.h"
-#include "hw/pci/pci.h"
+#include "hw/pci/pci_device.h"
 #include "vga_int.h"
 #include "ui/console.h"
 #include "qemu/timer.h"

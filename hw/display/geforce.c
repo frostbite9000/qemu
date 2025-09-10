@@ -15,7 +15,7 @@
 #include "qemu/module.h"
 #include "qapi/error.h"
 #include "hw/qdev-properties.h"
-#include "hw/pci/pci.h"
+#include "hw/pci/pci_device.h"
 #include "migration/vmstate.h"
 #include "ui/console.h"
 #include "ui/pixel_ops.h"
@@ -404,21 +404,6 @@ static void geforce_ramht_lookup(GeForceState *s, uint32_t handle, uint32_t chid
 }
 
 /* Graphics operations implementation */
-
-/* Color conversion helpers */
-static uint32_t color_565_to_888(uint16_t value)
-{
-    uint8_t r, g, b;
-    EXTRACT_565_TO_888(value, r, g, b);
-    return r << 16 | g << 8 | b;
-}
-
-static uint16_t color_888_to_565(uint32_t value)
-{
-    return (((value >> 19) & 0x1F) << 11) | 
-           (((value >> 10) & 0x3F) << 5) | 
-           ((value >> 3) & 0x1F);
-}
 
 /* Pixel operations */
 static uint32_t geforce_get_pixel(GeForceState *s, uint32_t obj, 
@@ -1854,9 +1839,8 @@ static const MemoryRegionOps geforce_mmio_ops = {
 };
 
 /* Property definitions */
-static Property geforce_properties[] = {
+static const Property geforce_properties[] = {
     DEFINE_PROP_UINT32("model", GeForceState, card_type, GEFORCE_3),
-    DEFINE_PROP_END_OF_LIST(),
 };
 
 /* VMState for save/restore */
@@ -2048,7 +2032,7 @@ static void geforce_unrealize(PCIDevice *pci_dev)
 }
 
 /* Class initialization */
-static void geforce_class_init(ObjectClass *klass, void *data)
+static void geforce_class_init(ObjectClass *klass, const void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(klass);
     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);

@@ -13,6 +13,7 @@
 
 #include "qemu/osdep.h"
 #include "hw/pci/pci.h"
+#include "vga_int.h"
 #include "ui/console.h"
 #include "qemu/timer.h"
 
@@ -197,6 +198,7 @@ typedef struct {
 /* Main GeForce device state */
 struct GeForceState {
     PCIDevice parent_obj;
+    VGACommonState vga;
 
     /* Basic device info */
     uint32_t card_type;

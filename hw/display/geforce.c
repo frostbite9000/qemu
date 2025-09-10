@@ -1259,38 +1259,6 @@ void geforce_fifo_process(GeForceState *s, uint32_t chid)
     }
 }
 
-/* Display update functions */
-static void geforce_update_display(void *opaque)
-{
-    GeForceState *s = GEFORCE(opaque);
-    DisplaySurface *surface = qemu_console_surface(s->con);
-    
-    if (!s->display_enabled || !surface) {
-        return;
-    }
-    
-    /* Update the display surface from VRAM */
-    uint32_t src_stride = s->pitch;
-    uint32_t dst_stride = surface_stride(surface);
-    uint8_t *src = s->disp_ptr;
-    uint8_t *dst = surface_data(surface);
-    
-    uint32_t height = MIN(s->yres, surface_height(surface));
-    uint32_t copy_width = MIN(src_stride, dst_stride);
-    
-    for (uint32_t y = 0; y < height; y++) {
-        memcpy(dst, src, copy_width);
-        src += src_stride;
-        dst += dst_stride;
-    }
-    
-    dpy_gfx_update(s->con, 0, 0, s->xres, s->yres);
-}
-
-static const GraphicHwOps geforce_gfx_ops = {
-    .gfx_update = geforce_update_display,
-};
-
 /* VBlank timer */
 static void geforce_vblank_timer(void *opaque)
 {
@@ -1971,6 +1939,7 @@ static void geforce_reset(DeviceState *dev)
 static void geforce_realize(PCIDevice *pci_dev, Error **errp)
 {
     GeForceState *s = GEFORCE(pci_dev);
+    VGACommonState *vga = &s->vga;
     
     /* Set device IDs based on card type */
     uint16_t device_id;
@@ -2042,8 +2011,12 @@ static void geforce_realize(PCIDevice *pci_dev, Error **errp)
     }
     
     /* Initialize display console */
-    s->con = graphic_console_init(DEVICE(s), 0, &geforce_gfx_ops, s);
-    qemu_console_resize(s->con, s->xres, s->yres);
+    if (!vga_common_init(vga, OBJECT(s), errp)) {
+        return;
+    }
+    vga_init(vga, OBJECT(s), pci_address_space(pci_dev),
+             pci_address_space_io(pci_dev), true);
+    vga->con = graphic_console_init(DEVICE(s), 0, s->vga.hw_ops, vga);
     
     /* Initialize timers */
     s->vblank_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, geforce_vblank_timer, s);

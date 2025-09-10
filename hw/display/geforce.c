@@ -2062,7 +2062,7 @@ static void geforce_class_init(ObjectClass *klass, void *data)
     k->subsystem_id = 0x2863;
     
     dc->desc = "NVIDIA GeForce Graphics Card";
-    dc->reset = geforce_reset;
+    device_class_set_legacy_reset(dc, geforce_reset);
     dc->vmsd = &vmstate_geforce;
     device_class_set_props(dc, geforce_properties);
     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);

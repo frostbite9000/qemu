@@ -15,6 +15,13 @@ config VGA_CIRRUS
     depends on PCI
     select VGA
 
+config VOODOO_BANSHEE
+    bool
+    default y if PCI_DEVICES
+    depends on PCI
+    select VGA
+    select EDID
+
 config G364FB
     bool
 

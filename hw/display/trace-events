@@ -1,5 +1,13 @@
 # See docs/devel/tracing.rst for syntax documentation.
 
+# voodoo_banshee.c
+voodoo_mmio_read(uint32_t addr, uint32_t value, unsigned size) "mmio read addr=0x%04x value=0x%08x size=%u"
+voodoo_mmio_write(uint32_t addr, uint32_t value, unsigned size) "mmio write addr=0x%04x value=0x%08x size=%u"
+voodoo_lfb_read(uint64_t addr, uint64_t value, unsigned size) "lfb read addr=0x%08"PRIx64" value=0x%08"PRIx64" size=%u"
+voodoo_lfb_write(uint64_t addr, uint64_t value, unsigned size) "lfb write addr=0x%08"PRIx64" value=0x%08"PRIx64" size=%u"
+voodoo_2d_bitblt(uint32_t src_x, uint32_t src_y, uint32_t dst_x, uint32_t dst_y, uint32_t width, uint32_t height) "2d bitblt src=(%d,%d) dst=(%d,%d) size=%dx%d"
+voodoo_3d_triangle(uint32_t vertex_count) "3d triangle setup vertices=%d"
+
 # jazz_led.c
 jazz_led_read(uint64_t addr, uint8_t val) "read addr=0x%"PRIx64": 0x%x"
 jazz_led_write(uint64_t addr, uint8_t new) "write addr=0x%"PRIx64": 0x%x"

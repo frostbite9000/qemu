@@ -121,13 +121,65 @@ static uint64_t voodoo_mmio_read(void *opaque, hwaddr addr, unsigned size)
         break;
         
     case VOODOO_REG_PCIINIT0:
+        value = s->pci_init_enable;
+        break;
+        
     case VOODOO_REG_PCIINIT1:
+        value = s->pci_init_remap;
+        break;
+        
     case VOODOO_REG_SIPMONITOR:
     case VOODOO_REG_VGAINIT0:
     case VOODOO_REG_VGAINIT1:
     case VOODOO_REG_DRAMMODE0:
     case VOODOO_REG_DRAMMODE1:
+    case VOODOO_REG_AGPINIT0:
+    case VOODOO_REG_MISCINIT0:
+    case VOODOO_REG_MISCINIT1:
+    case VOODOO_REG_DRAMINIT0:
+    case VOODOO_REG_DRAMINIT1:
         value = voodoo_reg_read(s, offset);
+        break;
+        
+    /* 2D registers */
+    case VOODOO_2D_CLIP0MIN:
+        value = s->twoD.clip0_min;
+        break;
+    case VOODOO_2D_CLIP0MAX:
+        value = s->twoD.clip0_max;
+        break;
+    case VOODOO_2D_DSTBASE:
+        value = s->twoD.dst_base;
+        break;
+    case VOODOO_2D_DSTFORMAT:
+        value = s->twoD.dst_format;
+        break;
+    case VOODOO_2D_SRCBASE:
+        value = s->twoD.src_base;
+        break;
+    case VOODOO_2D_SRCFORMAT:
+        value = s->twoD.src_format;
+        break;
+    case VOODOO_2D_SRCSIZE:
+        value = s->twoD.src_size;
+        break;
+    case VOODOO_2D_SRCXY:
+        value = s->twoD.src_xy;
+        break;
+    case VOODOO_2D_COLORBACK:
+        value = s->twoD.color_back;
+        break;
+    case VOODOO_2D_COLORFORE:
+        value = s->twoD.color_fore;
+        break;
+    case VOODOO_2D_DSTSIZE:
+        value = s->twoD.dst_size;
+        break;
+    case VOODOO_2D_DSTXY:
+        value = s->twoD.dst_xy;
+        break;
+    case VOODOO_2D_COMMAND_2D:
+        value = s->twoD.command;
         break;
         
     default:
@@ -177,7 +229,78 @@ static void voodoo_mmio_write(void *opaque, hwaddr addr, uint64_t value,
         
     case VOODOO_REG_DRAMMODE0:
     case VOODOO_REG_DRAMMODE1:
+    case VOODOO_REG_AGPINIT0:
+    case VOODOO_REG_MISCINIT0:
+    case VOODOO_REG_MISCINIT1:
+    case VOODOO_REG_DRAMINIT0:
+    case VOODOO_REG_DRAMINIT1:
         voodoo_reg_write(s, offset, value);
+        break;
+        
+    /* 2D registers */
+    case VOODOO_2D_CLIP0MIN:
+        s->twoD.clip0_min = value;
+        break;
+    case VOODOO_2D_CLIP0MAX:
+        s->twoD.clip0_max = value;
+        break;
+    case VOODOO_2D_DSTBASE:
+        s->twoD.dst_base = value & 0xffffff;  /* 24-bit address */
+        break;
+    case VOODOO_2D_DSTFORMAT:
+        s->twoD.dst_format = value;
+        break;
+    case VOODOO_2D_SRCBASE:
+        s->twoD.src_base = value & 0xffffff;  /* 24-bit address */
+        break;
+    case VOODOO_2D_SRCFORMAT:
+        s->twoD.src_format = value;
+        break;
+    case VOODOO_2D_SRCSIZE:
+        s->twoD.src_size = value;
+        break;
+    case VOODOO_2D_SRCXY:
+        s->twoD.src_xy = value;
+        break;
+    case VOODOO_2D_COLORBACK:
+        s->twoD.color_back = value;
+        break;
+    case VOODOO_2D_COLORFORE:
+        s->twoD.color_fore = value;
+        break;
+    case VOODOO_2D_DSTSIZE:
+        s->twoD.dst_size = value;
+        break;
+    case VOODOO_2D_DSTXY:
+        s->twoD.dst_xy = value;
+        break;
+    case VOODOO_2D_COMMAND_2D:
+        s->twoD.command = value;
+        break;
+    case VOODOO_2D_LAUNCH_2D:
+        /* Execute 2D operation based on command */
+        {
+            uint32_t cmd = s->twoD.command & 0x7;
+            switch (cmd) {
+            case 0: /* NOP */
+                break;
+            case 1: /* Screen-to-screen BitBlt */
+                voodoo_2d_bitblt(s);
+                break;
+            case 2: /* Pattern fill */
+                voodoo_2d_pattern_fill(s);
+                break;
+            case 3: /* Screen-to-screen stretch BitBlt */
+                qemu_log_mask(LOG_UNIMP, "voodoo: stretch BitBlt not implemented\n");
+                break;
+            case 4: /* Host-to-screen BitBlt */
+                qemu_log_mask(LOG_UNIMP, "voodoo: host-to-screen BitBlt not implemented\n");
+                break;
+            default:
+                qemu_log_mask(LOG_GUEST_ERROR, "voodoo: unknown 2D command %d\n", cmd);
+                break;
+            }
+        }
         break;
         
     default:
@@ -310,7 +433,7 @@ static void voodoo_realize(PCIDevice *pci_dev, Error **errp)
     
     /* Initialize memory regions */
     memory_region_init_io(&s->mmio, obj, &voodoo_mmio_ops, s,
-                          "voodoo-banshee.mmio", VOODOO_IO_SIZE);
+                          "voodoo-banshee.mmio", VOODOO_2D_SIZE);
     
     memory_region_init_io(&s->lfb, obj, &voodoo_lfb_ops, s,
                           "voodoo-banshee.lfb", s->vram_size);

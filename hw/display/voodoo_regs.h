@@ -22,7 +22,7 @@
 #define VOODOO_BANSHEE_MEMSIZE      16*1024*1024  /* 16MB */
 #define VOODOO_3_MEMSIZE           32*1024*1024   /* 32MB */
 
-/* Register offsets */
+/* Register offsets - Configuration space */
 #define VOODOO_REG_PCIINIT0         0x04
 #define VOODOO_REG_SIPMONITOR       0x08
 #define VOODOO_REG_SSTATUS          0x0c
@@ -41,25 +41,25 @@
 #define VOODOO_REG_TMUGBEINIT       0x58
 #define VOODOO_REG_VGAINIT2         0x5c
 
-/* 2D registers */
-#define VOODOO_2D_CLIP0MIN          0x08
-#define VOODOO_2D_CLIP0MAX          0x0c
-#define VOODOO_2D_DSTBASE           0x10
-#define VOODOO_2D_DSTFORMAT         0x14
-#define VOODOO_2D_SRCBASE           0x34
-#define VOODOO_2D_COMMANDEXTRA_2D   0x38
-#define VOODOO_2D_CLIP1MIN          0x4c
-#define VOODOO_2D_CLIP1MAX          0x50
-#define VOODOO_2D_SRCFORMAT         0x54
-#define VOODOO_2D_SRCSIZE           0x58
-#define VOODOO_2D_SRCXY             0x5c
-#define VOODOO_2D_COLORBACK         0x60
-#define VOODOO_2D_COLORFORE         0x64
-#define VOODOO_2D_DSTSIZE           0x68
-#define VOODOO_2D_DSTXY             0x6c
-#define VOODOO_2D_COMMAND_2D        0x70
-#define VOODOO_2D_LAUNCH_2D         0x80
-#define VOODOO_2D_PATTERNBASE       0x100
+/* 2D registers - separate address space at 0x100 */
+#define VOODOO_2D_CLIP0MIN          0x108
+#define VOODOO_2D_CLIP0MAX          0x10c
+#define VOODOO_2D_DSTBASE           0x110
+#define VOODOO_2D_DSTFORMAT         0x114
+#define VOODOO_2D_SRCBASE           0x134
+#define VOODOO_2D_COMMANDEXTRA_2D   0x138
+#define VOODOO_2D_CLIP1MIN          0x14c
+#define VOODOO_2D_CLIP1MAX          0x150
+#define VOODOO_2D_SRCFORMAT         0x154
+#define VOODOO_2D_SRCSIZE           0x158
+#define VOODOO_2D_SRCXY             0x15c
+#define VOODOO_2D_COLORBACK         0x160
+#define VOODOO_2D_COLORFORE         0x164
+#define VOODOO_2D_DSTSIZE           0x168
+#define VOODOO_2D_DSTXY             0x16c
+#define VOODOO_2D_COMMAND_2D        0x170
+#define VOODOO_2D_LAUNCH_2D         0x180
+#define VOODOO_2D_PATTERNBASE       0x200
 
 /* VGA registers */
 #define VOODOO_VGA_CRTC_INDEX       0x3d4
@@ -142,7 +142,7 @@
 
 /* Memory region sizes */
 #define VOODOO_IO_SIZE              0x100
-#define VOODOO_2D_SIZE              0x200
+#define VOODOO_2D_SIZE              0x400  /* Power of 2 to accommodate 2D registers */
 #define VOODOO_3D_SIZE              0x200
 
 /* Banshee specific constants */

@@ -8,7 +8,7 @@ system_ss.add(when: 'CONFIG_FW_CFG_DMA', if_true: files('ramfb-standalone.c'))
 
 system_ss.add(when: 'CONFIG_VGA_CIRRUS', if_true: files('cirrus_vga.c'))
 system_ss.add(when: ['CONFIG_VGA_CIRRUS', 'CONFIG_VGA_ISA'], if_true: files('cirrus_vga_isa.c'))
-system_ss.add(when: 'CONFIG_VOODOO_BANSHEE', if_true: files('voodoo_banshee.c', 'voodoo_2d.c'))
+system_ss.add(when: 'CONFIG_VOODOO_BANSHEE', if_true: files('voodoo_banshee.c', 'voodoo_2d.c', 'voodoo_3d.c'))
 system_ss.add(when: 'CONFIG_G364FB', if_true: files('g364fb.c'))
 system_ss.add(when: 'CONFIG_JAZZ_LED', if_true: files('jazz_led.c'))
 system_ss.add(when: 'CONFIG_PL110', if_true: files('pl110.c'))

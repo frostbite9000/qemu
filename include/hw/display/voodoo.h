@@ -178,6 +178,11 @@ void voodoo_2d_screen_to_screen(VoodooBansheeState *s);
 /* 3D operations */
 void voodoo_3d_triangle_setup(VoodooBansheeState *s);
 void voodoo_3d_rasterize(VoodooBansheeState *s);
+void voodoo_3d_init(VoodooBansheeState *s);
+uint32_t voodoo_3d_reg_read(VoodooBansheeState *s, uint32_t offset);
+void voodoo_3d_reg_write(VoodooBansheeState *s, uint32_t offset, uint32_t value);
+void voodoo_texture_setup(VoodooBansheeState *s, int tmu_index, uint32_t base_addr);
+void voodoo_3d_write_pixel(VoodooBansheeState *s, int x, int y, uint32_t color, uint32_t depth);
 
 /* Memory access helpers */
 uint32_t voodoo_mem_readl(VoodooBansheeState *s, uint32_t addr);

@@ -102,7 +102,19 @@ static const GraphicHwOps voodoo_gfx_ops = {
     .gfx_update = voodoo_update_display,
 };
 
-/* Remove unused function */
+/* Hardware cursor support */
+void voodoo_update_cursor(VoodooBansheeState *s)
+{
+    /* Basic cursor implementation stub */
+    qemu_log_mask(LOG_UNIMP, "voodoo: hardware cursor not fully implemented\n");
+}
+
+/* Video overlay support */
+void voodoo_update_overlay(VoodooBansheeState *s)
+{  
+    /* Basic overlay implementation stub */
+    qemu_log_mask(LOG_UNIMP, "voodoo: video overlay not fully implemented\n");
+}
 
 /* Memory-mapped I/O read */
 static uint64_t voodoo_mmio_read(void *opaque, hwaddr addr, unsigned size)
@@ -180,6 +192,33 @@ static uint64_t voodoo_mmio_read(void *opaque, hwaddr addr, unsigned size)
         break;
     case VOODOO_2D_COMMAND_2D:
         value = s->twoD.command;
+        break;
+        
+    /* Video overlay registers */
+    case VOODOO_VIDPROCCFG:
+        value = s->overlay.vidproc_cfg;
+        break;
+    case VOODOO_HWCURPATADDR:
+        value = s->cursor.addr;
+        break;
+    case VOODOO_HWCURLOC:
+        value = (s->cursor.y << 16) | s->cursor.x;
+        break;
+    case VOODOO_HWCURC0:
+        value = s->cursor.color0;
+        break;
+    case VOODOO_HWCURC1:
+        value = s->cursor.color1;
+        break;
+        
+    /* 3D registers */
+    case VOODOO_3D_STATUS:
+    case VOODOO_3D_INTRCTRL:
+    case VOODOO_3D_VGAINIT0:
+    case VOODOO_3D_VGAINIT1:
+    case VOODOO_3D_DRAMMODE0:
+    case VOODOO_3D_DRAMMODE1:
+        value = voodoo_3d_reg_read(s, offset);
         break;
         
     default:
@@ -303,6 +342,35 @@ static void voodoo_mmio_write(void *opaque, hwaddr addr, uint64_t value,
         }
         break;
         
+    /* Video overlay registers */
+    case VOODOO_VIDPROCCFG:
+        s->overlay.vidproc_cfg = value;
+        break;
+    case VOODOO_HWCURPATADDR:
+        s->cursor.addr = value;
+        break;
+    case VOODOO_HWCURLOC:
+        s->cursor.x = value & 0xffff;
+        s->cursor.y = (value >> 16) & 0xffff;
+        break;
+    case VOODOO_HWCURC0:
+        s->cursor.color0 = value;
+        break;
+    case VOODOO_HWCURC1:
+        s->cursor.color1 = value;
+        break;
+        
+    /* 3D registers */
+    case VOODOO_3D_INTRCTRL:
+    case VOODOO_3D_VGAINIT0:
+    case VOODOO_3D_VGAINIT1:
+    case VOODOO_3D_DRAMMODE0:
+    case VOODOO_3D_DRAMMODE1:
+    case VOODOO_3D_MISCINIT0:
+    case VOODOO_3D_MISCINIT1:
+        voodoo_3d_reg_write(s, offset, value);
+        break;
+        
     default:
         qemu_log_mask(LOG_UNIMP, "voodoo: unimplemented mmio write at 0x%04x\n", 
                       offset);
@@ -395,6 +463,9 @@ static void voodoo_reset(DeviceState *dev)
     memset(&s->threeD, 0, sizeof(s->threeD));
     memset(&s->cursor, 0, sizeof(s->cursor));
     memset(&s->overlay, 0, sizeof(s->overlay));
+    
+    /* Initialize 3D engine */
+    voodoo_3d_init(s);
     
     /* Set default display parameters */
     s->width = 640;

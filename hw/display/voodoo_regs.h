@@ -97,22 +97,22 @@
 #define VOODOO_VIDININXADDR         0xb8
 #define VOODOO_VIDININXDATA         0xbc
 
-/* 3D registers */
-#define VOODOO_3D_INTRCTRL          0x00
-#define VOODOO_3D_STATUS            0x00
-#define VOODOO_3D_PCIINIT0          0x04
-#define VOODOO_3D_SIPMONITOR        0x08
-#define VOODOO_3D_LFBMEMORYCONFIG   0x0c
-#define VOODOO_3D_MISCINIT0         0x10
-#define VOODOO_3D_MISCINIT1         0x14
-#define VOODOO_3D_DRAMINIT0         0x18
-#define VOODOO_3D_DRAMINIT1         0x1c
-#define VOODOO_3D_AGPINIT0          0x20
-#define VOODOO_3D_AGPINIT1          0x24
-#define VOODOO_3D_VGAINIT0          0x28
-#define VOODOO_3D_VGAINIT1          0x2c
-#define VOODOO_3D_DRAMMODE0         0x30
-#define VOODOO_3D_DRAMMODE1         0x34
+/* 3D registers - separate address space at 0x300 */
+#define VOODOO_3D_STATUS            0x300
+#define VOODOO_3D_INTRCTRL          0x304
+#define VOODOO_3D_PCIINIT0          0x308
+#define VOODOO_3D_SIPMONITOR        0x30c
+#define VOODOO_3D_LFBMEMORYCONFIG   0x310
+#define VOODOO_3D_MISCINIT0         0x314
+#define VOODOO_3D_MISCINIT1         0x318
+#define VOODOO_3D_DRAMINIT0         0x31c
+#define VOODOO_3D_DRAMINIT1         0x320
+#define VOODOO_3D_AGPINIT0          0x324
+#define VOODOO_3D_AGPINIT1          0x328
+#define VOODOO_3D_VGAINIT0          0x32c
+#define VOODOO_3D_VGAINIT1          0x330
+#define VOODOO_3D_DRAMMODE0         0x334
+#define VOODOO_3D_DRAMMODE1         0x338
 
 /* Banshee 2D command register bits */
 #define VOODOO_2D_ROP_MASK          0x1f
@@ -142,7 +142,7 @@
 
 /* Memory region sizes */
 #define VOODOO_IO_SIZE              0x100
-#define VOODOO_2D_SIZE              0x400  /* Power of 2 to accommodate 2D registers */
+#define VOODOO_2D_SIZE              0x400  /* Power of 2 to accommodate all registers */
 #define VOODOO_3D_SIZE              0x200
 
 /* Banshee specific constants */
